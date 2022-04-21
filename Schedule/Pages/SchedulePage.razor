@@ -1,0 +1,88 @@
+@page "/schedule/{routeNumber?}"
+@using global::Schedule.Data
+@inject RouteManager RouteManager
+
+<PageTitle>Расписание</PageTitle>
+
+<MudContainer>
+    <MudStack Row="true" Spacing="2">
+        <MudText Typo="Typo.h4">
+            Расписание по маршруту
+        </MudText>
+        <MudSelect T="int" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined"  ValueChanged="OnSelectedRoute">
+            @foreach (var item in _values)
+            {
+                <MudSelectItem Value="@item"/>
+            }
+        </MudSelect>
+    </MudStack>
+    
+    <Animate Animation="Animations.FadeUp" Duration="TimeSpan.FromSeconds(0.5)" @ref="_anim">
+        <MudTable T="Route" Items="@_routeList">
+            <HeaderContent>
+                <MudTh>
+                    <MudTableSortLabel T="Route" SortBy="model => model.To">Куда</MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel T="Route" SortBy="model => model.From">Откуда</MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel T="Route" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
+                </MudTh>
+                <MudTh> 
+                    <MudTableSortLabel T="Route" SortBy="model => model.Note">Примечание</MudTableSortLabel>
+                </MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Куда">@context.To</MudTd>
+                <MudTd DataLabel="Откуда">@context.From</MudTd>
+                <MudTd DataLabel="Время">@context.DepartureTime.Hour:@context.DepartureTime.Minute</MudTd>
+                <MudTd DataLabel="Примечание">@context.Note</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </Animate>
+
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public int? RouteNumber { get; set; }
+    
+    List<int> _values;
+    IQueryable<Route> _routeList;
+    Animate _anim;
+
+    protected override void OnInitialized()
+    {
+        if (RouteNumber != null)
+        {
+            SetDefaultValues();
+        }
+        else
+        {
+            SetValues();
+        }
+    }
+
+    private void SetDefaultValues()
+    {
+        _values = RouteManager.GetRouteNumbers();
+    }
+    
+    void SetValues()
+    {
+        _values = RouteManager.GetRouteNumbers();
+    }
+    
+    private async void OnSelectedRoute(int id)
+    {
+        _anim.Run();
+        
+        _routeList = await RouteManager.GetRoutesAsync(id);
+        _anim.Animation = Animations.FadeDown;
+        
+        _anim.Run();
+    }
+
+}

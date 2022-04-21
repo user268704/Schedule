@@ -1,0 +1,47 @@
+@page "/resources"
+@using Schedule.Data
+@inject RouteManager Route
+
+<MudStack Row="true" Spacing="15" Style="margin-top: 30px" Justify="Justify.SpaceAround">
+    <MudCard Class="mud_card">
+        <div class="card_media_parent">
+            <MudCardMedia Image="pictures/marilyn.jpg" Height="380" Class="mud_card_image"/>
+        </div>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" FullWidth="true" Class="card_button" OnClick="GetFullSchedule">
+                Полное расписание
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+    <MudStack Spacing="5" >
+        <MudText>
+            Или выберите конкретный маршрут
+        </MudText>
+        <MudSelect T="int" ValueChanged="OnSelectedRoute">
+            @foreach (var item in _values)
+            {
+                <MudSelectItem Value="@item"/>
+            }
+        </MudSelect>
+    </MudStack>
+</MudStack>
+
+@code {
+    List<int> _values;
+
+    protected override void OnInitialized()
+    {
+        _values = Route.GetRouteNumbers();
+    }
+
+    private void GetFullSchedule()
+    {
+        
+    }
+
+    private void OnSelectedRoute(int route)
+    {
+        
+    }
+
+}

@@ -1,0 +1,58 @@
+@page "/about"
+
+<HeadContent>
+    <link rel="stylesheet" href="/css/about.css" >
+    <link rel="stylesheet" href="/css/common.css" >
+</HeadContent>
+
+<MudContainer>
+    <MudStack Spacing="16">
+        <MudText Typo="Typo.h1">
+            О проекте
+        </MudText>
+        <div class="about-block">
+            <MudText Typo="Typo.h3">
+                Кто и зачем?
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Проект $prjName создавался как курсовая работа, студентом второго курса местного техникума,<br/> при поддержке студии веб-дизайна <MudLink Href="@_linkToStudy" Class="link">BGIT the best</MudLink>
+            </MudText>
+        </div>
+        <div class="about-block">
+            <MudText Typo="Typo.h3">
+                Откуда берется расписание?
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Вся информация бралась с сайта белокалитвенской газеты <MudLink Href="https://perekrestokinfo.ru" Class="link">перекресток</MudLink>, за актуальность информации отвечают так же они
+            </MudText>
+        </div>
+        <div class="contacts-block">
+            <MudText Typo="Typo.h3">
+                Contacts
+            </MudText>
+            <MudStack>
+                <MudText Typo="Typo.body1">
+                    По старинке можно пообщаться тут <MudLink Href="@_contactMail" Class="link">@_contactMail</MudLink>
+                </MudText>
+            </MudStack>
+            <MudStack Spacing="1" Row="true">
+                <MudText Typo="Typo.body1">
+                    Или можно в соц.сетях тут
+                </MudText>
+                <MudStack Spacing="10" Row="true">
+                    <MudIconButton Icon="@Icons.Custom.Brands.Telegram" Href="@_telegramContact" Color="Color.Dark"/>
+                    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@_gutHubContact" Color="Color.Dark"/>
+                    <MudIconButton Icon="@Icons.Custom.Brands.Twitter" Href="@_twitterContact" Color="Color.Dark"/>
+                </MudStack>
+            </MudStack>
+        </div>
+    </MudStack>
+</MudContainer>
+
+@code {
+    string _linkToStudy = "https://google.com";
+    string _contactMail = "vanagagarin7@gmail.com";
+    string _telegramContact = "https://google.com";
+    string _gutHubContact = "https://google.com";
+    string _twitterContact = "https://google.com";
+}

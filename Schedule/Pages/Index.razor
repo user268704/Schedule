@@ -1,0 +1,94 @@
+﻿@page "/"
+@using Schedule.Services.Js
+@using System.ComponentModel.DataAnnotations
+@inject BrowserService Service
+@inject ISnackbar Snackbar
+
+<PageTitle>Главная</PageTitle>
+<HeadContent>
+    <link href="css/index.css" rel="stylesheet"/>
+</HeadContent>
+
+<MudStack Spacing="16">
+    <MudContainer>
+        <MudTextField T="string" @bind-Value="SearchText" Variant="Variant.Outlined" AdornmentIcon="@Icons.Filled.Search"
+                      Adornment="Adornment.End" Label="Поиск по маршруту, пункту назначения/отправления"/>
+    </MudContainer>
+    <MudStack Row="true" Justify="Justify.SpaceAround">
+        <MudLink Href="/schedule" Underline="Underline.None">
+            <MudCard Class="mud_card">
+                <div class="card_media_parent">
+                    <MudCardMedia Image="pictures/placeholder_1.jpg" Class="mud_card_image"/>
+                </div>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Align="Align.Center">Полное расписание</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudLink>
+        <MudLink Href="/about" Underline="Underline.None">
+            <MudCard Class="mud_card">
+                <div class="card_media_parent">
+                    <MudCardMedia Image="pictures/placeholder_2.jpg" Class="mud_card_image"/>
+                </div>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Align="Align.Center">О проекте</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudLink>
+        <MudLink Href="/resources" Underline="Underline.None">
+            <MudCard Class="mud_card">
+                <div class="card_media_parent">
+                    <MudCardMedia Image="pictures/placeholder_3.jpg" Class="mud_card_image"/>
+                </div>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Align="Align.Center">Материалы</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudLink>
+    </MudStack>
+    <div class="form_input">
+        <MudText Typo="Typo.h2">
+            Надо связаться и обсудить что то?<br/>
+            Можно ниже 👇
+        </MudText>
+        <MudStack Row="true" Justify="Justify.SpaceAround" Style="margin: 20px">
+            <MudForm Model="FeedbackForm" Style="width: 40%">
+                <MudTextField T="string" Label="Как вас записать" For="() => FeedbackForm.UserName" Required="true"
+                              RequiredError="Пууустооо, так нельзя, мне надо знать кто пишет" Variant="Variant.Filled" @bind-Value="FeedbackForm.UserName"/>
+
+                <MudTextField T="string" Label="Куда отвечать" For="() => FeedbackForm.UserEmail" Required="true"
+                              RequiredError="Можно конечно и без почты, но я не хочу" ErrorText="Вообще-то, здесь надо ввести корректный адрес"
+                              Variant="Variant.Filled" @bind-Value="FeedbackForm.UserEmail"/>
+
+                <MudTextField T="string" FullWidth="true" Label="Пожалуйтесь, или похвалите здесь" For="() => FeedbackForm.UserMessage" Required="true"
+                              RequiredError="Пууустоооо, я не могу за вас додумать сообщение 😁" Lines="10" Variant="Variant.Filled" @bind-Value="FeedbackForm.UserMessage"/>
+
+                <MudButton StartIcon="@Icons.Filled.Done" Style="margin-top: 20px" Variant="Variant.Outlined" OnClick="SendWishes">Готово</MudButton>
+            </MudForm>
+            <MudText Typo="Typo.h4" Align="Align.End">
+                Ни один символ <br/> не останется без внимания
+            </MudText>
+        </MudStack>
+    </div>
+</MudStack>
+
+
+@code
+{
+    private class FeedbackFormModel
+    {
+        public string UserName { get; set; }
+        
+        [EmailAddress(ErrorMessage = "Не не, так не пойдёт, надо настоящую почту")]
+        public string UserEmail { get; set; }
+        public string UserMessage { get; set; }
+    }
+
+    private FeedbackFormModel FeedbackForm { get; set; } = new();
+    private string SearchText { get; set; }
+
+    private void SendWishes()
+    {
+        Snackbar.Add("Пасибочки", Severity.Success, options => options.Icon = Icons.Filled.FavoriteBorder);
+    }
+}

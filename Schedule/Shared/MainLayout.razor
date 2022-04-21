@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Schedule</PageTitle>
+<MudThemeProvider Theme="ThemeProvider"/>
+<MudLayout>
+    <MudAppBar Fixed="true">
+        <MudIconButton Icon="@Icons.Filled.Favorite" Color="Color.Secondary" OnClick="ToggleDrawer"/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_openedDrawer" Fixed="true" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.Left">
+        <MudNavMenu>
+            <MudNavLink Icon="@Icons.Filled.Home" IconColor="Color.Secondary" Href="/">Главная</MudNavLink>
+            <MudNavLink Icon="@Icons.Filled.Schedule" IconColor="Color.Secondary" Href="/schedule">Расписание</MudNavLink>
+            <MudNavLink Icon="@Icons.Filled.Description" IconColor="Color.Secondary" Href="/resources">Ресурсы</MudNavLink>
+            <MudNavLink Icon="@Icons.Filled.ContactMail" IconColor="Color.Secondary" Href="/about">О проекте</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+    <footer>
+        
+    </footer>
+</MudLayout>
+
+@code{
+
+    private MudTheme ThemeProvider { get; set; } = new()
+    {
+        Palette = new()
+        {
+            AppbarBackground = new("#262626"),
+            DrawerBackground = new(0,0,0,255),
+            Secondary = new(255,255,255,255),
+            TextSecondary = new("#999999"),
+            DrawerText = new("#fff"),
+            ActionDefault = new("#2E8C81"),
+            Background = new(255,255,255,255),
+            Primary = new("#2E8C81")
+        },
+        Typography = new()
+        {
+            Body1 =
+            {
+                FontSize = "1.25em"
+            }
+        }
+    };
+    
+    bool _openedDrawer;
+
+    void ToggleDrawer()
+    {
+        _openedDrawer = !_openedDrawer;
+    }
+}
