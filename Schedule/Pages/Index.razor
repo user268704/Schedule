@@ -1,8 +1,7 @@
 ﻿@page "/"
-@using Schedule.Services.Js
 @using System.ComponentModel.DataAnnotations
-@inject BrowserService Service
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager;
 
 <PageTitle>Главная</PageTitle>
 <HeadContent>
@@ -11,41 +10,94 @@
 
 <MudStack Spacing="16">
     <MudContainer>
-        <MudTextField T="string" @bind-Value="SearchText" Variant="Variant.Outlined" AdornmentIcon="@Icons.Filled.Search"
+        <MudTextField @bind-Value="SearchText" Immediate="true" InputMode="InputMode.search" @onkeypress="SearchRoute" Variant="Variant.Outlined" AdornmentIcon="@Icons.Filled.Search"
                       Adornment="Adornment.End" Label="Поиск по маршруту, пункту назначения/отправления"/>
     </MudContainer>
     <MudStack Row="true" Justify="Justify.SpaceAround">
-        <MudLink Href="/schedule" Underline="Underline.None">
-            <MudCard Class="mud_card">
-                <div class="card_media_parent">
-                    <MudCardMedia Image="pictures/placeholder_1.jpg" Class="mud_card_image"/>
-                </div>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4" Align="Align.Center">Полное расписание</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudLink>
-        <MudLink Href="/about" Underline="Underline.None">
-            <MudCard Class="mud_card">
-                <div class="card_media_parent">
-                    <MudCardMedia Image="pictures/placeholder_2.jpg" Class="mud_card_image"/>
-                </div>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4" Align="Align.Center">О проекте</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudLink>
-        <MudLink Href="/resources" Underline="Underline.None">
-            <MudCard Class="mud_card">
-                <div class="card_media_parent">
-                    <MudCardMedia Image="pictures/placeholder_3.jpg" Class="mud_card_image"/>
-                </div>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4" Align="Align.Center">Материалы</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudLink>
+        <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/schedule")'>
+            <div class="card_media_parent">
+                <MudCardMedia Image="pictures/placeholder_1.jpg" Class="mud_card_image"/>
+            </div>
+            <MudCardContent>
+                <MudText Typo="Typo.h4" Align="Align.Center">Полное расписание</MudText>
+            </MudCardContent>
+        </MudCard>
+        <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/about")'>
+            <div class="card_media_parent">
+                <MudCardMedia Image="pictures/placeholder_2.jpg" Class="mud_card_image"/>
+            </div>
+            <MudCardContent>
+                <MudText Typo="Typo.h4" Align="Align.Center">О проекте</MudText>
+            </MudCardContent>
+        </MudCard>
+        <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/resources")'>
+            <div class="card_media_parent">
+                <MudCardMedia Image="pictures/placeholder_3.jpg" Class="mud_card_image"/>
+            </div>
+            <MudCardContent>
+                <MudText Typo="Typo.h4" Align="Align.Center">Материалы</MudText>
+            </MudCardContent>
+        </MudCard>
     </MudStack>
+    <MudContainer>
+        <MudExpansionPanels>
+            <MudExpansionPanel Text="Откуда взялись автобусы?">
+                <ChildContent>
+                    <MudImage Src="/pictures/OldBuses/pervyuj_prototip.jpg"/>
+
+                    <MudText Typo="Typo.body1" Align="Align.Justify">
+                        Создателем первого изобретения, похожего на автобус, стал британец Ричард Тревитик из небольшого города Кэмборн.
+                        В канун Рождества 1801 года машина, которую тестировал изобретатель на улице, собрала толпу любопытных горожан.
+                        В изобретении насчитывалось 8 сидячих мест, а в качестве топлива использовался уголь.
+                        В топку его подбрасывал кочегар, стоящий на специальной подножке.
+                    </MudText>
+                </ChildContent>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Почему именно автобус?">
+                <ChildContent>
+                    <MudImage Src="/pictures/OldBuses/first_bus.jpg"/>
+                    <MudText Typo="Typo.body1" Align="Align.Justify">
+                        Новое средство передвижения быстро стало популярным в Европе и Соединенных штатах Америки.
+                        Название транспорт получил благодаря соединению слов автомобиль и омнибус.
+                        Именно омнибус – конный экипаж – использовался для перевозки людей до известного нам изобретения.
+                    </MudText>
+                </ChildContent>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Первый автобус в России">
+                <ChildContent>
+                    <MudImage Src="/pictures/OldBuses/pervyj_v_Rossii.jpg"/>
+                    
+                    <MudText Typo="Typo.body1" Align="Align.Justify">
+                        На территории Российской империи первый электрический автобус появился в 1901 году.
+                        Выпустил его столичный завод «Дукс».
+                        Транспортное средство имело 10 сидений и набирало скорость до 20 км/час.
+                    </MudText>
+                </ChildContent>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Первые автобусные маршруты">
+                <ChildContent>
+                    <MudImage Src="/pictures/OldBuses/novyj_status.jpg"/>
+                    
+                    <MudText Typo="Typo.body1" Align="Align.Justify">
+                        Первый городской автобус начал курсировать по Лондону весной 1903 года.
+                        Чуть позже, в 1907 году, быстрые транспортные средства начали возить жителей Архангельска и Санкт-Петербурга.
+                        А в 1924 году запустили первый автобусный маршрут в Москве, который помогал добраться пассажирам с Тверской заставы на Калачевскую площадь.
+                    </MudText>
+                </ChildContent>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Лондонский автобус призрак">
+                <ChildContent>
+                    <MudImage Src="/pictures/OldBuses/symvol_Londona.jpg"/>
+                    
+                    <MudText Typo="Typo.body1" Align="Align.Justify">
+                        Двухэтажные лондонские автобусы красного цвета уже стали местной достопримечательностью, но не многие знают, что впервые они появились на улицах британской столицы в 1959 году.
+                        Экскурсоводы рассказывают туристам легенду о Routemaster №7, который появляется ниоткуда и также загадочно исчезает на перекрестке двух улиц.
+                        Мистичности данной истории добавляет еще и то, что именно на перекрестке Кембридж Гарденс и Сейнт-Маркс-роуд чаще всего случаются странные ДТП.
+                    </MudText>
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudContainer>
     <div class="form_input">
         <MudText Typo="Typo.h2">
             Надо связаться и обсудить что то?<br/>
@@ -90,5 +142,13 @@
     private void SendWishes()
     {
         Snackbar.Add("Пасибочки", Severity.Success, options => options.Icon = Icons.Filled.FavoriteBorder);
+    }
+    
+    private void SearchRoute(KeyboardEventArgs obj)
+    {
+        if (obj.Key.ToLower() == "enter")
+        {
+            NavigationManager.NavigateTo($"/schedule/{SearchText}");
+        }
     }
 }

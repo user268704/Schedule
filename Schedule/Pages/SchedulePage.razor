@@ -1,88 +1,139 @@
-@page "/schedule/{routeNumber?}"
+@page "/schedule/{routeNumber}"
+@page "/schedule"
 @using global::Schedule.Data
 @inject RouteManager RouteManager
+@inject IDialogService MessageBox;
 
 <PageTitle>Расписание</PageTitle>
 
-<MudContainer>
-    <MudStack Row="true" Spacing="2">
-        <MudText Typo="Typo.h4">
-            Расписание по маршруту
-        </MudText>
-        <MudSelect T="int" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined"  ValueChanged="OnSelectedRoute">
-            @foreach (var item in _values)
-            {
-                <MudSelectItem Value="@item"/>
-            }
-        </MudSelect>
-    </MudStack>
-    
-    <Animate Animation="Animations.FadeUp" Duration="TimeSpan.FromSeconds(0.5)" @ref="_anim">
-        <MudTable T="Route" Items="@_routeList">
-            <HeaderContent>
-                <MudTh>
-                    <MudTableSortLabel T="Route" SortBy="model => model.To">Куда</MudTableSortLabel>
-                </MudTh>
-                <MudTh>
-                    <MudTableSortLabel T="Route" SortBy="model => model.From">Откуда</MudTableSortLabel>
-                </MudTh>
-                <MudTh>
-                    <MudTableSortLabel T="Route" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
-                </MudTh>
-                <MudTh> 
-                    <MudTableSortLabel T="Route" SortBy="model => model.Note">Примечание</MudTableSortLabel>
-                </MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Куда">@context.To</MudTd>
-                <MudTd DataLabel="Откуда">@context.From</MudTd>
-                <MudTd DataLabel="Время">@context.DepartureTime.Hour:@context.DepartureTime.Minute</MudTd>
-                <MudTd DataLabel="Примечание">@context.Note</MudTd>
-            </RowTemplate>
-        </MudTable>
-    </Animate>
+@if (_scheduleLoad)
+{
+    <MudOverlay @bind-Visible="_scheduleLoad" LockScroll="true" DarkBackground="true">
+        <MudProgressCircular Color="@Color.Primary" Indeterminate="true"/>
+    </MudOverlay>
+}
 
+<MudContainer>
+    <MudStack Spacing="5">
+        <MudStack Row="true" Spacing="2">
+            <MudText Typo="Typo.h4">
+                Расписание по маршруту
+            </MudText>
+            <MudSelect T="int" @ref="_selectRoute" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined" ValueChanged="OnSelectedRoute">
+                @if (_routeNumbers != null)
+                {
+                    @foreach (var item in _routeNumbers)
+                    {
+                        <MudSelectItem Value="@item"/>
+                    }
+                }
+            </MudSelect>
+        </MudStack>
+
+        @if (_routes != null && _routes.Any())
+        {
+            <MudTable T="Route" Items="@_routes">
+                <HeaderContent>
+                    <MudTh>
+                        <MudTableSortLabel T="Route" SortBy="model => model.To">Куда</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="Route" SortBy="model => model.From">Откуда</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="Route" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="Route" SortBy="model => model.Note">Примечание</MudTableSortLabel>
+                    </MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Куда">@context.To</MudTd>
+                    <MudTd DataLabel="Откуда">@context.From</MudTd>
+                    <MudTd DataLabel="Время">@context.DepartureTime.Hour:@context.DepartureTime.Minute</MudTd>
+                    <MudTd DataLabel="Примечание">@context.Note</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudStack>
 </MudContainer>
 
 
 @code {
     [Parameter]
-    public int? RouteNumber { get; set; }
-    
-    List<int> _values;
-    IQueryable<Route> _routeList;
-    Animate _anim;
+    public string? RouteNumber { get; set; }
 
-    protected override void OnInitialized()
+    MudSelect<int> _selectRoute;
+    List<int> _routeNumbers;
+    IQueryable<Route> _routes;
+    private bool _scheduleLoad;
+    
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (RouteNumber != null)
+        if (firstRender)
         {
+            StartLoading();
+        
             SetDefaultValues();
-        }
-        else
-        {
-            SetValues();
+
+            if (RouteNumber != null)
+            {
+                SetValues();
+            }
+
+            StopLoading();
         }
     }
-
+    
     private void SetDefaultValues()
     {
-        _values = RouteManager.GetRouteNumbers();
+        _routeNumbers = RouteManager.GetRouteNumbers();
     }
-    
+
+    /// <summary>Sets the search value</summary>
     void SetValues()
     {
-        _values = RouteManager.GetRouteNumbers();
+        if (int.TryParse(RouteNumber, out var route))
+        {
+            _routes = RouteManager.GetRoutes(route);
+            _selectRoute.Value = route;
+            
+            return;
+        }
+
+        _routes = RouteManager.GetRoutesByPoint(RouteNumber);
+
+        if (_routes.Any())
+        {
+            _selectRoute.Value = _routes.First().RouteNumber;
+            
+            return;
+        }
+
+        StopLoading();
+        ShowErrorSearch();
     }
-    
-    private async void OnSelectedRoute(int id)
+
+    private void StartLoading()
     {
-        _anim.Run();
-        
-        _routeList = await RouteManager.GetRoutesAsync(id);
-        _anim.Animation = Animations.FadeDown;
-        
-        _anim.Run();
+        _scheduleLoad = true;
+        StateHasChanged();
+    }
+
+    private void StopLoading()
+    {
+        _scheduleLoad = false;
+        StateHasChanged();
+    }
+
+    private void ShowErrorSearch()
+    {
+        MessageBox.ShowMessageBox("Не удалось ничего найти", "Ничего подходящего не найдено, может очепятка где ни-будь?", yesText:"Сейчас переделаю");
+    }
+
+    private void OnSelectedRoute(int id)
+    {
+        _routes = RouteManager.GetRoutes(id);
     }
 
 }

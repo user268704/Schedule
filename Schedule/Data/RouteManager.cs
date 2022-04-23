@@ -10,13 +10,29 @@ public class RouteManager
         return result;
     }
 
-    public async Task<IQueryable<Route>> GetRoutesAsync(int routeNumber)
+    public IQueryable<Route> GetRoutes(int routeNumber)
     {
         DataContext db = new();
         
-        return await from result in db.Routes 
+        return from result in db.Routes 
             where result.RouteNumber == routeNumber 
             select result;
+    }
+
+    public IQueryable<Route> GetAllRoutes()
+    {
+        DataContext db = new();
+        return db.Routes;
+    }
+
+    public IQueryable<Route> GetRoutesByPoint(string fromOrTo)
+    {
+        DataContext db = new();
+        
+        var from = db.Routes.Where(item => item.From.Contains(fromOrTo));
+        var to = db.Routes.Where(item => item.To.Contains(fromOrTo));
+
+        return from.Any() ? from : to;
     }
 
     public List<int> GetRouteNumbers()

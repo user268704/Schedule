@@ -2,11 +2,12 @@
 
 <PageTitle>Schedule</PageTitle>
 <MudThemeProvider Theme="ThemeProvider"/>
+<MudDialogProvider/>
 <MudLayout>
     <MudAppBar Fixed="true">
-        <MudIconButton Icon="@Icons.Filled.Favorite" Color="Color.Secondary" OnClick="ToggleDrawer"/>
+        <MudToggleIconButton ToggledIcon="@Icons.Filled.MenuOpen" Icon="@Icons.Filled.Menu" @bind-Toggled="_openedDrawer" @onclick="ToggleDrawer" Color="Color.Secondary" ToggledColor="Color.Secondary"/>
     </MudAppBar>
-    <MudDrawer @bind-Open="@_openedDrawer" Fixed="true" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.Left">
+    <MudDrawer @bind-Open="@_openedDrawer" Fixed="true" Variant="DrawerVariant.Mini" OpenMiniOnHover="true" ClipMode="DrawerClipMode.Always" Anchor="Anchor.Left">
         <MudNavMenu>
             <MudNavLink Icon="@Icons.Filled.Home" IconColor="Color.Secondary" Href="/">Главная</MudNavLink>
             <MudNavLink Icon="@Icons.Filled.Schedule" IconColor="Color.Secondary" Href="/schedule">Расписание</MudNavLink>
@@ -23,8 +24,10 @@
 </MudLayout>
 
 @code{
+    private MudMainContent _layout;
+    private bool _openedDrawer;
 
-    private MudTheme ThemeProvider { get; set; } = new()
+    private MudTheme ThemeProvider { get; } = new()
     {
         Palette = new()
         {
@@ -34,8 +37,8 @@
             TextSecondary = new("#999999"),
             DrawerText = new("#fff"),
             ActionDefault = new("#2E8C81"),
-            Background = new(255,255,255,255),
-            Primary = new("#2E8C81")
+            Background = new("#fff"),
+            Primary = new("#2E8C81"),
         },
         Typography = new()
         {
@@ -45,8 +48,6 @@
             }
         }
     };
-    
-    bool _openedDrawer;
 
     void ToggleDrawer()
     {
