@@ -1,3 +1,5 @@
+using Route = Schedule.Data.Models.Route;
+
 namespace Schedule.Data;
 
 public class RouteManager

@@ -1,19 +1,26 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>Schedule</PageTitle>
+<PageTitle>Расписание автобусов в Белой Калитве</PageTitle>
 <MudThemeProvider Theme="ThemeProvider"/>
 <MudDialogProvider/>
 <MudLayout>
     <MudAppBar Fixed="true">
         <MudToggleIconButton ToggledIcon="@Icons.Filled.MenuOpen" Icon="@Icons.Filled.Menu" @bind-Toggled="_openedDrawer" @onclick="ToggleDrawer" Color="Color.Secondary" ToggledColor="Color.Secondary"/>
     </MudAppBar>
-    <MudDrawer @bind-Open="@_openedDrawer" Fixed="true" Variant="DrawerVariant.Mini" OpenMiniOnHover="true" ClipMode="DrawerClipMode.Always" Anchor="Anchor.Left">
-        <MudNavMenu>
-            <MudNavLink Icon="@Icons.Filled.Home" IconColor="Color.Secondary" Href="/">Главная</MudNavLink>
-            <MudNavLink Icon="@Icons.Filled.Schedule" IconColor="Color.Secondary" Href="/schedule">Расписание</MudNavLink>
-            <MudNavLink Icon="@Icons.Filled.Description" IconColor="Color.Secondary" Href="/resources">Ресурсы</MudNavLink>
-            <MudNavLink Icon="@Icons.Filled.ContactMail" IconColor="Color.Secondary" Href="/about">О проекте</MudNavLink>
-        </MudNavMenu>
+    <MudDrawer @bind-Open="@_openedDrawer" Fixed="true" Variant="DrawerVariant.Responsive" ClipMode="DrawerClipMode.Never" Anchor="Anchor.Left">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                BGIT the Best
+            </MudText>
+        </MudDrawerHeader>
+        <MudDrawerContainer>
+            <MudNavMenu>
+                <MudNavLink Icon="@Icons.Filled.Home" IconColor="Color.Secondary" Href="/">Главная</MudNavLink>
+                <MudNavLink Icon="@Icons.Filled.Schedule" IconColor="Color.Secondary" Href="/schedule">Расписание</MudNavLink>
+                <MudNavLink Icon="@Icons.Filled.Description" IconColor="Color.Secondary" Href="/resources">Ресурсы</MudNavLink>
+                <MudNavLink Icon="@Icons.Filled.ContactMail" IconColor="Color.Secondary" Href="/about">О проекте</MudNavLink>
+            </MudNavMenu>
+        </MudDrawerContainer>
     </MudDrawer>
     <MudMainContent>
         @Body

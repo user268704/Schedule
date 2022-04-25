@@ -1,6 +1,7 @@
 using MudBlazor.Services;
 using Schedule;
 using Schedule.Data;
+using Schedule.Data.Models;
 using Schedule.Services.Js;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddMudServices();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<BrowserService>();
 builder.Services.AddSingleton<RouteManager>();
+builder.Services.Configure<Contacts>(builder.Configuration.GetSection(Contacts.BlockName));
+builder.Services.Configure<About>(builder.Configuration.GetSection(About.BlockName));
 
 var app = builder.Build();
 

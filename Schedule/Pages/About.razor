@@ -1,4 +1,8 @@
 @page "/about"
+@using Microsoft.Extensions.Options
+@using Schedule.Data.Models
+@inject IOptions<Contacts> OptionsContacts
+@inject IOptions<Data.Models.About> OptionsAbout
 
 <HeadContent>
     <link rel="stylesheet" href="/css/about.css" >
@@ -15,7 +19,7 @@
                 Кто и зачем?
             </MudText>
             <MudText Typo="Typo.body1">
-                Проект $prjName создавался как курсовая работа, студентом второго курса местного техникума,<br/> при поддержке студии веб-дизайна <MudLink Href="@_linkToStudy" Class="link">BGIT the best</MudLink>
+                Проект @_projectName создавался как курсовая работа, студентом второго курса местного техникума,<br/> при поддержке студии веб-дизайна <MudLink Href="@_linkToStudy" Class="link">BGIT the best</MudLink>
             </MudText>
         </div>
         <div class="about-block">
@@ -41,7 +45,7 @@
                 </MudText>
                 <MudStack Spacing="10" Row="true">
                     <MudIconButton Icon="@Icons.Custom.Brands.Telegram" Href="@_telegramContact" Color="Color.Dark"/>
-                    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@_gutHubContact" Color="Color.Dark"/>
+                    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@_gitHubContact" Color="Color.Dark"/>
                     <MudIconButton Icon="@Icons.Custom.Brands.Twitter" Href="@_twitterContact" Color="Color.Dark"/>
                 </MudStack>
             </MudStack>
@@ -50,9 +54,25 @@
 </MudContainer>
 
 @code {
-    string _linkToStudy = "https://google.com";
-    string _contactMail = "vanagagarin7@gmail.com";
-    string _telegramContact = "https://google.com";
-    string _gutHubContact = "https://google.com";
-    string _twitterContact = "https://google.com";
+    string _linkToStudy;
+    string _contactMail;
+    string _telegramContact;
+    string _gitHubContact;
+    string _twitterContact;
+    string _projectName;
+
+    protected override void OnInitialized()
+    {
+        SetFields();
+    }
+
+    private void SetFields()
+    {
+        _linkToStudy = OptionsAbout.Value.StudyHome;
+        _projectName = OptionsAbout.Value.ProjectName;
+        _contactMail = OptionsContacts.Value.Mail;
+        _gitHubContact = OptionsContacts.Value.GitHub;
+        _twitterContact = OptionsContacts.Value.Twitter;
+        _telegramContact = OptionsContacts.Value.Telegram;
+    }
 }

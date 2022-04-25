@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Schedule
+﻿namespace Schedule.Data.Models
 {
     public partial class Route
     {
