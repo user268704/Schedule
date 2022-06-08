@@ -2,7 +2,7 @@ namespace Schedule.Data.Models;
 
 public class Contacts
 {
-    public const string BlockName = "Contacts";
+    public const string SectionName = "Contacts";
     
     public string Mail { get; set; }
     public string GitHub { get; set; }

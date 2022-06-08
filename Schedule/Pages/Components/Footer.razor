@@ -1,0 +1,33 @@
+@using Microsoft.Extensions.Options
+@inject IOptions<Data.Models.Contacts> Contacts
+
+<MudStack Row="true" Justify="Justify.SpaceBetween">
+    <MudStack Row="true">
+        <MudStack Row="true">
+            <MudText Typo="Typo.body1">
+                Связь
+            </MudText>
+            <MudIcon Icon="@Icons.Custom.Brands.Telegram"/>
+            <MudIcon Icon="@Icons.Custom.Brands.GitHub"/>
+        </MudStack>
+    </MudStack>
+    <MudStack>
+        <MudText Align="Align.Center" Typo="Typo.h3">
+            Copyright <br/>
+            Все права защищены
+        </MudText>
+    </MudStack>
+    <MudStack>
+        <MudStack Row="true">
+            <MudText Typo="Typo.body1">Студия веб дизайна</MudText>
+            <MudImage Src="/puctures/StudioLogo.png" Alt="Bgit The Best Logo"/>
+        </MudStack>
+        <MudText Typo="Typo.body1">
+            Разработчик: <MudLink Href="@Contacts.Value.Mail">Ivan Gagarin</MudLink>
+        </MudText>
+    </MudStack>
+</MudStack>
+
+@code {
+    
+}

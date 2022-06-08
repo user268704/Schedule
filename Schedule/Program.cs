@@ -1,19 +1,30 @@
 using MudBlazor.Services;
-using Schedule;
-using Schedule.Data;
+using Schedule.Core.Interfaces.Data;
+using Schedule.Core.Interfaces.Services;
 using Schedule.Data.Models;
-using Schedule.Services.Js;
+using Schedule.Services;
+using Schedule.Services.Mail;
+using Schedule.Services.Pdf;
+using AboutConfig = Schedule.Data.Models.About;
+using RouteContext = Schedule.Infrastructure.Data.Context.RouteContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services.AddMudServices(options =>
+{
+    options.SnackbarConfiguration.PreventDuplicates = false;
+    options.SnackbarConfiguration.MaxDisplayedSnackbars = 5;
+});
 builder.Services.AddServerSideBlazor();
-builder.Services.AddMudServices();
-builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<BrowserService>();
-builder.Services.AddSingleton<RouteManager>();
-builder.Services.Configure<Contacts>(builder.Configuration.GetSection(Contacts.BlockName));
-builder.Services.Configure<About>(builder.Configuration.GetSection(About.BlockName));
+builder.Services.AddScoped<IRouteData, RouteContext>();
+builder.Services.AddScoped<INavigation, NavigationService>();
+builder.Services.AddScoped<IPdfBuilder, MainDocument>();
+builder.Services.AddScoped<IFindRoute, FindRoutes>();
+builder.Services.AddScoped<IMailService, MailService>();
+
+builder.Services.Configure<AboutConfig>(builder.Configuration.GetSection(AboutConfig.SectionName));
+builder.Services.Configure<Contacts>(builder.Configuration.GetSection(Contacts.SectionName));
 
 var app = builder.Build();
 

@@ -1,47 +1,94 @@
 @page "/resources"
-@using Schedule.Data
-@inject RouteManager Route
+@using QuestPDF.Infrastructure
+@using Schedule.Services.Pdf
+@using QuestPDF.Fluent
+@using Microsoft.Extensions.Options
+@using Schedule.Core.Interfaces.Data
+@using Schedule.Core.Interfaces.Services
+@inject IRouteData RouteData
+@inject IFindRoute FindRoute
+@inject IPdfBuilder PdfBuilder
+@inject IJSRuntime JS
+@inject IOptions<Data.Models.About> AboutConf
 
-<MudStack Row="true" Spacing="15" Style="margin-top: 30px" Justify="Justify.SpaceAround">
-    <MudCard Class="mud_card">
-        <div class="card_media_parent">
-            <MudCardMedia Image="pictures/marilyn.jpg" Height="380" Class="mud_card_image"/>
-        </div>
-        <MudCardActions>
-            <MudButton Variant="Variant.Text" FullWidth="true" Class="card_button" OnClick="GetFullSchedule">
-                Полное расписание
+<PageTitle>PDF расписание общественного транспорта в городе Белая Калитва - @AboutConf.Value.ProjectName</PageTitle>
+
+<MudContainer>
+    <MudStack Spacing="10" Style="margin-top: 30px" Justify="Justify.SpaceAround">
+        <MudStack>
+            <MudText Typo="Typo.h3">
+                Здесь можно получить расписание в виде pdf
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Просто выберите ниже маршрут, по какому требуется расписание
+            </MudText>
+            <MudSelect T="string" @bind-Value="selectedValue" Variant="Variant.Outlined" Placeholder="Выберете нужный вам маршрут">
+                @foreach (var item in _values)
+                {
+                    <MudSelectItem Value="@item"/>
+                }
+            </MudSelect>
+            <MudStack Row="true">
+                <MudSpacer/>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Download" OnClick="GetConcreteSchedule">
+                    Сохранить
+                </MudButton>
+            </MudStack>
+        </MudStack>
+        <MudText Typo="Typo.h3" Align="Align.Center">ИЛИ</MudText>
+        <MudStack Spacing="4">
+            <MudText Typo="Typo.body1" Align="Align.Center">
+                Сохраните себе полное расписание, по всем доступным маршрутам
+            </MudText>
+            <MudButton FullWidth="true" Variant="Variant.Filled" StartIcon="@Icons.Filled.Download" OnClick="GetFullSchedule">
+                Получить полное расписание
             </MudButton>
-        </MudCardActions>
-    </MudCard>
-    <MudStack Spacing="5" >
-        <MudText>
-            Или выберите конкретный маршрут
-        </MudText>
-        <MudSelect T="int" ValueChanged="OnSelectedRoute">
-            @foreach (var item in _values)
-            {
-                <MudSelectItem Value="@item"/>
-            }
-        </MudSelect>
+        </MudStack>
     </MudStack>
-</MudStack>
+</MudContainer>
 
 @code {
-    List<int> _values;
+    IEnumerable<string> _values = Array.Empty<string>();
+    string selectedValue;
 
     protected override void OnInitialized()
     {
-        _values = Route.GetRouteNumbers();
+        _values = RouteData.GetAllRoutes().Select(item => item.RouteName).Distinct();
     }
 
-    private void GetFullSchedule()
+    private async Task GetFullSchedule()
     {
+        // BUG: Сделать нормально всё
+        /*var allRoutes = RouteData.GetAllRoutes();
+
+        var routes = allRoutes.OrderBy(item => item.RouteName);
         
+        pdfDoc = new MainDocument(routes);
+        byte[] resultPdf = pdfDoc.GeneratePdf();
+
+        Stream pdfStream = new MemoryStream(resultPdf);
+        using var streamJs = new DotNetStreamReference(pdfStream);
+        
+        await JS.InvokeVoidAsync("downloadFileFromStream", PdfBuilder.GetMetadata().Title, streamJs);*/
     }
 
-    private void OnSelectedRoute(int route)
+    private async Task GetConcreteSchedule()
     {
-        
-    }
+        if (string.IsNullOrEmpty(selectedValue))
+        {
+            return;
+        }
 
+        var routes = FindRoute.Find(selectedValue);
+
+        if (routes != null)
+        {
+            byte[] resultPdf = PdfBuilder.BuildPdf(routes);
+
+            Stream pdfStream = new MemoryStream(resultPdf);
+            using var streamJs = new DotNetStreamReference(pdfStream);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", PdfBuilder.GetMetadata().Title, streamJs);
+        }
+    }
 }

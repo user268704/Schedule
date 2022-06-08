@@ -1,9 +1,15 @@
-@page "/schedule/{routeNumber}"
 @page "/schedule"
-@using global::Schedule.Data
+@using Schedule.Core.Interfaces.Data
+@using Schedule.Core.Interfaces.Services
 @using Schedule.Data.Models
-@inject RouteManager RouteManager
-@inject IDialogService MessageBox;
+@inject IPdfBuilder PdfBuilder
+@inject IRouteData RouteData
+@inject IFindRoute FindService
+@inject INavigation Navigation
+@inject IJSRuntime JS
+@inject IDialogService MessageBox
+@inject NavigationManager NavigationManager;
+
 
 <PageTitle>Расписание</PageTitle>
 
@@ -20,10 +26,10 @@
             <MudText Typo="Typo.h4">
                 Расписание по маршруту
             </MudText>
-            <MudSelect T="int" @ref="_selectRoute" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined" ValueChanged="OnSelectedRoute">
-                @if (_routeNumbers != null)
+            <MudSelect T="string" @ref="_selectRoute" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined" ValueChanged="OnSelectedRoute" Placeholder="Выберете нужный вам маршрут">
+                @if (_routeNames != null)
                 {
-                    @foreach (var item in _routeNumbers)
+                    @foreach (var item in _routeNames)
                     {
                         <MudSelectItem Value="@item"/>
                     }
@@ -33,86 +39,135 @@
 
         @if (_routes != null && _routes.Any())
         {
-            <MudTable T="Route" Items="@_routes">
+            <MudTable T="RouteItem" Items="@_routes" GroupBy="@_groupDefinition" Loading="_scheduleLoad" Hover="true" Breakpoint="Breakpoint.Sm">
+                <ColGroup>
+                    <col/>
+                    <col/>
+                    <col/>
+                    <col/>
+                </ColGroup>
                 <HeaderContent>
                     <MudTh>
-                        <MudTableSortLabel T="Route" SortBy="model => model.To">Куда</MudTableSortLabel>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.To">Куда</MudTableSortLabel>
                     </MudTh>
                     <MudTh>
-                        <MudTableSortLabel T="Route" SortBy="model => model.From">Откуда</MudTableSortLabel>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.From">Откуда</MudTableSortLabel>
                     </MudTh>
                     <MudTh>
-                        <MudTableSortLabel T="Route" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
                     </MudTh>
                     <MudTh>
-                        <MudTableSortLabel T="Route" SortBy="model => model.Note">Примечание</MudTableSortLabel>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.Note">Примечание</MudTableSortLabel>
                     </MudTh>
                 </HeaderContent>
+                <GroupHeaderTemplate>
+                    @if ((bool) context.Key)
+                    {
+                        <MudTh>
+                            Выходные, праздники
+                        </MudTh>
+                    }
+                    else
+                    {
+                        <MudTh>
+                            Будни
+                        </MudTh>
+                    }
+                </GroupHeaderTemplate>
                 <RowTemplate>
                     <MudTd DataLabel="Куда">@context.To</MudTd>
                     <MudTd DataLabel="Откуда">@context.From</MudTd>
-                    <MudTd DataLabel="Время">@context.DepartureTime.Hour:@context.DepartureTime.Minute</MudTd>
+                    <MudTd DataLabel="Время">@context.DepartureTime</MudTd>
                     <MudTd DataLabel="Примечание">@context.Note</MudTd>
                 </RowTemplate>
             </MudTable>
+            <MudStack Row="true" Justify="Justify.FlexEnd"> 
+                <MudButton OnClick="SaveAsPdf" StartIcon="@Icons.Filled.Download" Variant="Variant.Filled">
+                    Сохранить на память
+                </MudButton>
+            </MudStack>
         }
     </MudStack>
 </MudContainer>
 
 
 @code {
-    [Parameter]
-    public string? RouteNumber { get; set; }
+    private string Search { get; set; }
+    private TableGroupDefinition<RouteItem> _groupDefinition = new()
+    {
+        Indentation = false,
+        Expandable = false,
+        Selector = route => route.IsSpecialDay
+    };
 
-    MudSelect<int> _selectRoute;
-    List<int> _routeNumbers;
-    IQueryable<Route> _routes;
+    MudSelect<string> _selectRoute;
+    IEnumerable<string> _routeNames;
+    IEnumerable<RouteItem> _routes;
     private bool _scheduleLoad;
+
+    protected override void OnInitialized()
+    {
+        // Нет отписки, так как нет обработчика переключения страниц
+        NavigationManager.LocationChanged += LocationChanged;
+
+        Dictionary<string, string> paramsFromQuery = Navigation.GetParamsFromQuery(NavigationManager.Uri);
+
+        try
+        {
+            Search = paramsFromQuery["search"];
+        }
+        catch (KeyNotFoundException) { }
+    }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        Dictionary<string, string> paramsFromQuery = Navigation.GetParamsFromQuery(NavigationManager.Uri);
+
+
+        string search = Search;
+        paramsFromQuery.TryGetValue("search", out search);
+    }
     
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
             StartLoading();
-        
+            _routeNames = RouteData.GetAllRoutes()
+                .Distinct()
+                .Select(item => item.RouteName);
+
             SetDefaultValues();
-
-            if (RouteNumber != null)
-            {
-                SetValues();
-            }
-
+            
+            if (Search != null) 
+                FindRoute(Search);
+            
             StopLoading();
         }
     }
     
     private void SetDefaultValues()
     {
-        _routeNumbers = RouteManager.GetRouteNumbers();
     }
 
     /// <summary>Sets the search value</summary>
-    void SetValues()
+    void FindRoute(string query)
     {
-        if (int.TryParse(RouteNumber, out var route))
+        if (string.IsNullOrEmpty(query))
         {
-            _routes = RouteManager.GetRoutes(route);
-            _selectRoute.Value = route;
-            
             return;
         }
 
-        _routes = RouteManager.GetRoutesByPoint(RouteNumber);
-
-        if (_routes.Any())
+        try
         {
-            _selectRoute.Value = _routes.First().RouteNumber;
+            var resultRoutes = FindService.Find(query);
             
-            return;
+            _routes = resultRoutes;
         }
-
-        StopLoading();
-        ShowErrorSearch();
+        catch (Exception)
+        {
+            ShowErrorSearch();
+        }
     }
 
     private void StartLoading()
@@ -132,9 +187,26 @@
         MessageBox.ShowMessageBox("Не удалось ничего найти", "Ничего подходящего не найдено, может очепятка где ни-будь?", yesText:"Сейчас переделаю");
     }
 
-    private void OnSelectedRoute(int id)
+    private void OnSelectedRoute(string id)
     {
-        _routes = RouteManager.GetRoutes(id);
+        _routes = FindService.Find(id);
     }
+    
+    private async Task SaveAsPdf()
+    {
+        if (string.IsNullOrEmpty(_selectRoute.Value))
+        {
+            return;
+        }
 
+        StartLoading();
+        
+        byte[] resultPdf = PdfBuilder.BuildPdf(_routes);
+        StopLoading();
+
+        Stream pdfStream = new MemoryStream(resultPdf);
+        using var streamJs = new DotNetStreamReference(pdfStream);
+        
+        await JS.InvokeVoidAsync("downloadFileFromStream", PdfBuilder.GetMetadata().Title, streamJs);
+    }
 }

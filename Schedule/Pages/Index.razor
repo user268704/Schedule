@@ -1,9 +1,17 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Mail
+@using Microsoft.Extensions.Options
+@using Schedule.Core.Interfaces.Data
+@using Schedule.Core.Interfaces.Services
+@using Schedule.Services.Mail
 @inject ISnackbar Snackbar
-@inject NavigationManager NavigationManager;
+@inject NavigationManager NavigationManager
+@inject IMailService Mail;
+@inject IOptions<Data.Models.About> AboutConf
+@inject IOptions<Data.Models.Contacts> Contacts
 
-<PageTitle>Главная</PageTitle>
+<PageTitle>Главная - @_projectName</PageTitle>
 <HeadContent>
     <link href="css/index.css" rel="stylesheet"/>
 </HeadContent>
@@ -13,6 +21,7 @@
         <MudTextField @bind-Value="SearchText" Immediate="true" InputMode="InputMode.search" @onkeypress="SearchRoute" Variant="Variant.Outlined" AdornmentIcon="@Icons.Filled.Search"
                       Adornment="Adornment.End" Label="Поиск по маршруту, пункту назначения/отправления"/>
     </MudContainer>
+    
     <MudStack Row="true" Justify="Justify.SpaceAround">
         <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/schedule")'>
             <div class="card_media_parent">
@@ -44,7 +53,6 @@
             <MudExpansionPanel Text="Откуда взялись автобусы?">
                 <ChildContent>
                     <MudImage Src="/pictures/OldBuses/pervyuj_prototip.jpg"/>
-
                     <MudText Typo="Typo.body1" Align="Align.Justify">
                         Создателем первого изобретения, похожего на автобус, стал британец Ричард Тревитик из небольшого города Кэмборн.
                         В канун Рождества 1801 года машина, которую тестировал изобретатель на улице, собрала толпу любопытных горожан.
@@ -77,7 +85,6 @@
             <MudExpansionPanel Text="Первые автобусные маршруты">
                 <ChildContent>
                     <MudImage Src="/pictures/OldBuses/novyj_status.jpg"/>
-                    
                     <MudText Typo="Typo.body1" Align="Align.Justify">
                         Первый городской автобус начал курсировать по Лондону весной 1903 года.
                         Чуть позже, в 1907 году, быстрые транспортные средства начали возить жителей Архангельска и Санкт-Петербурга.
@@ -88,7 +95,6 @@
             <MudExpansionPanel Text="Лондонский автобус призрак">
                 <ChildContent>
                     <MudImage Src="/pictures/OldBuses/symvol_Londona.jpg"/>
-                    
                     <MudText Typo="Typo.body1" Align="Align.Justify">
                         Двухэтажные лондонские автобусы красного цвета уже стали местной достопримечательностью, но не многие знают, что впервые они появились на улицах британской столицы в 1959 году.
                         Экскурсоводы рассказывают туристам легенду о Routemaster №7, который появляется ниоткуда и также загадочно исчезает на перекрестке двух улиц.
@@ -98,30 +104,37 @@
             </MudExpansionPanel>
         </MudExpansionPanels>
     </MudContainer>
-    <div class="form_input">
+    <MudContainer>
         <MudText Typo="Typo.h2">
             Надо связаться и обсудить что то?<br/>
             Можно ниже 👇
         </MudText>
-        <MudStack Row="true" Justify="Justify.SpaceAround" Style="margin: 20px">
-            <MudForm Model="FeedbackForm" Style="width: 40%">
+        <MudForm Model="FeedbackForm" @bind-IsValid="_isFormValid">
+            <MudStack>
                 <MudTextField T="string" Label="Как вас записать" For="() => FeedbackForm.UserName" Required="true"
-                              RequiredError="Пууустооо, так нельзя, мне надо знать кто пишет" Variant="Variant.Filled" @bind-Value="FeedbackForm.UserName"/>
+                              RequiredError="Пууустооо, так нельзя, мне надо знать кто пишет" Variant="Variant.Text" @bind-Value="FeedbackForm.UserName"/>
+                
+                <MudCheckBox T="bool" @bind-Checked="_isRequiredRespond">
+                    Надо отвечать?
+                </MudCheckBox>
+                @if (_isRequiredRespond)
+                {
+                    <MudTextField T="string" Label="Куда отвечать (Ваша почта)" For="() => FeedbackForm.UserEmail" Required="true"
+                                  RequiredError="Ну куда же отвечать?" ErrorText="Вообще-то, здесь надо ввести корректный адрес"
+                                  Variant="Variant.Text" @bind-Value="FeedbackForm.UserEmail"/>   
+                }
+            </MudStack>
+            
+            <MudTextField T="string" FullWidth="true" Label="Пожалуйтесь, или похвалите здесь" For="() => FeedbackForm.UserMessage" Required="true"
+                          RequiredError="Пууустоооо, я не могу за вас додумать сообщение 😁" Lines="10" Variant="Variant.Filled" @bind-Value="FeedbackForm.UserMessage"/>
 
-                <MudTextField T="string" Label="Куда отвечать" For="() => FeedbackForm.UserEmail" Required="true"
-                              RequiredError="Можно конечно и без почты, но я не хочу" ErrorText="Вообще-то, здесь надо ввести корректный адрес"
-                              Variant="Variant.Filled" @bind-Value="FeedbackForm.UserEmail"/>
-
-                <MudTextField T="string" FullWidth="true" Label="Пожалуйтесь, или похвалите здесь" For="() => FeedbackForm.UserMessage" Required="true"
-                              RequiredError="Пууустоооо, я не могу за вас додумать сообщение 😁" Lines="10" Variant="Variant.Filled" @bind-Value="FeedbackForm.UserMessage"/>
-
-                <MudButton StartIcon="@Icons.Filled.Done" Style="margin-top: 20px" Variant="Variant.Outlined" OnClick="SendWishes">Готово</MudButton>
-            </MudForm>
-            <MudText Typo="Typo.h4" Align="Align.End">
-                Ни один символ <br/> не останется без внимания
-            </MudText>
-        </MudStack>
-    </div>
+            <MudButton StartIcon="@Icons.Filled.Done" Style="margin-top: 20px" Variant="Variant.Outlined" OnClick="SendWishes">Готово</MudButton>
+        </MudForm>
+        
+        <MudText Typo="Typo.h4" Align="Align.End">
+            Ни один символ <br/> не останется без внимания
+        </MudText>
+    </MudContainer>
 </MudStack>
 
 
@@ -132,23 +145,49 @@
         public string UserName { get; set; }
         
         [EmailAddress(ErrorMessage = "Не не, так не пойдёт, надо настоящую почту")]
-        public string UserEmail { get; set; }
+        public string? UserEmail { get; set; }
         public string UserMessage { get; set; }
     }
 
+    bool _isRequiredRespond;
+    string _projectName;
+    private bool _isFormValid;
     private FeedbackFormModel FeedbackForm { get; set; } = new();
     private string SearchText { get; set; }
 
+    protected override void OnInitialized()
+    {
+        _projectName = AboutConf.Value.ProjectName;
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+    }
+    
     private void SendWishes()
     {
-        Snackbar.Add("Пасибочки", Severity.Success, options => options.Icon = Icons.Filled.FavoriteBorder);
+        if (_isFormValid == false)
+        {
+            Snackbar.Add("Что то не так, надо ввести свои данные", configure:options =>
+            {
+                options.ShowCloseIcon = false;
+                options.SnackbarVariant = Variant.Outlined;
+                options.Icon = Icons.Filled.ThumbDown;
+            }, severity:Severity.Error);
+            
+            return;
+        }
+        
+        Snackbar.Add("Пасибочки", configure:options =>
+        {
+            options.ShowCloseIcon = false;
+            options.SnackbarVariant = Variant.Outlined;
+            options.Icon = Icons.Filled.FavoriteBorder;
+        });
     }
     
     private void SearchRoute(KeyboardEventArgs obj)
     {
         if (obj.Key.ToLower() == "enter")
         {
-            NavigationManager.NavigateTo($"/schedule/{SearchText}");
+            NavigationManager.NavigateTo($"/schedule?search={SearchText}");
         }
     }
 }
