@@ -1,12 +1,23 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.Extensions.Options
+@using Schedule.Core.Data.Models.Config
+@inherits LayoutComponentBase
+@inject IOptions<Contacts> Contacts
+@inject IOptions<About> About
 
 <PageTitle>Расписание автобусов в Белой Калитве</PageTitle>
-<MudThemeProvider Theme="ThemeProvider"/>
+<MudThemeProvider IsDarkMode="_isDarkMode" Theme="ThemeProvider"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 <MudLayout>
     <MudAppBar Fixed="false">
         <MudToggleIconButton ToggledIcon="@Icons.Filled.MenuOpen" Icon="@Icons.Filled.Menu" @bind-Toggled="_openedDrawer" @onclick="ToggleDrawer" Color="Color.Secondary" ToggledColor="Color.Secondary"/>
+        <MudSpacer/>
+        <MudText Typo="Typo.body1">
+            BGIT THE BEST
+        </MudText>
+        <MudTooltip Arrow="true" Text="Тема">
+            <MudToggleIconButton ToggledIcon="@Icons.Material.Filled.LightMode" Color="Color.Default"  ToggledColor="Color.Default" Icon="@Icons.Material.Filled.DarkMode" @bind-Toggled="_isDarkMode"/>
+        </MudTooltip>
     </MudAppBar>
     <MudDrawer @bind-Open="@_openedDrawer" Breakpoint="Breakpoint.Xl" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.Left">
         <MudDrawerHeader>
@@ -25,14 +36,74 @@
     </MudDrawer>
     <MudMainContent>
         @Body
-    </MudMainContent>
+    </MudMainContent>                                                                               
+    <MudDivider Style="margin: 20px 0" DividerType="DividerType.FullWidth"/>
     <footer>
-        
+        <MudStack Row="true" Style="margin: 20px 0" Justify="Justify.SpaceAround">
+            <MudStack Justify="Justify.FlexEnd" Class="feedback">
+                <MudText Typo="Typo.h4">
+                    Связь
+                </MudText>
+                <MudStack AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h5">
+                        Соц сеточки
+                    </MudText>
+                    <MudStack AlignItems="AlignItems.Center" Row="true">
+                        <MudText>Телега</MudText>
+                        <MudTooltip Text="Телега" Arrow="true" Placement="Placement.Bottom">
+                            <MudIconButton Icon="@Icons.Custom.Brands.Telegram" Href="@Contacts.Value.Telegram"/>
+                        </MudTooltip>
+                    </MudStack>
+                    <MudStack AlignItems="AlignItems.Center" Row="true">
+                        <MudText>GitHub</MudText>
+                        <MudTooltip Text="GitHub" Arrow="true" Placement="Placement.Bottom">
+                            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@Contacts.Value.GitHub"/>
+                        </MudTooltip>
+                    </MudStack>
+                    <MudStack AlignItems="AlignItems.Center" Row="true">
+                        <MudText>Твитор</MudText>
+                        <MudTooltip Text="Твитор" Arrow="true">
+                            <MudIconButton Icon="@Icons.Custom.Brands.Twitter" Href="@Contacts.Value.Twitter"/>
+                        </MudTooltip>
+                    </MudStack>
+                </MudStack>
+                <MudStack AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h5">
+                        Другие способы
+                    </MudText>
+                    <MudStack AlignItems="AlignItems.Center" Row="true">
+                        <MudText>Mail</MudText>
+                        <MudTooltip Text="Почта" Arrow="true">
+                            <MudIconButton Icon="@Icons.Custom.Brands.Gmail" Href="@Contacts.Value.Mail"/>
+                        </MudTooltip>
+                    </MudStack>
+                </MudStack>
+            </MudStack>
+            <MudStack Class="policy" Justify="Justify.FlexEnd">
+                <MudText Typo="Typo.h4" Align="Align.Center">
+                    Copyright
+                </MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">
+                    Все права, если кто не знал, защищены
+                </MudText>
+            </MudStack>
+            <MudStack Class="about" Justify="Justify.FlexEnd">
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h4">
+                        Студия веб-дизайна
+                    </MudText>
+                    <MudLink Href="@About.Value.StudyHome">
+                        <MudImage Style="border-radius: 40px" ObjectPosition="ObjectPosition.Center" Elevation="5" Src="./pictures/logo.png"/>
+                    </MudLink>
+                </MudStack>
+            </MudStack>
+        </MudStack>
     </footer>
 </MudLayout>
 
 @code{
     private bool _openedDrawer;
+    private bool _isDarkMode;
 
     private MudTheme ThemeProvider { get; } = new()
     {
@@ -43,9 +114,9 @@
             Secondary = new(255,255,255,255),
             TextSecondary = new("#999999"),
             DrawerText = new("#fff"),
-            ActionDefault = new("#2E8C81"),
+            ActionDefault = new("#b03434"),
             Background = new("#fff"),
-            Primary = new("#2E8C81"),
+            Primary = new("#b03434"),
         },
         Typography = new()
         {

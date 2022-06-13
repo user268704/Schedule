@@ -2,14 +2,15 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Net.Mail
 @using Microsoft.Extensions.Options
+@using Schedule.Core.Data.Models.Config
 @using Schedule.Core.Interfaces.Data
 @using Schedule.Core.Interfaces.Services
-@using Schedule.Services.Mail
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 @inject IMailService Mail;
-@inject IOptions<Data.Models.About> AboutConf
-@inject IOptions<Data.Models.Contacts> Contacts
+@inject IOptions<Core.Data.Models.Config.About> AboutConf
+@inject IOptions<Contacts> Contacts
+@inject IDialogService MessageBox
 
 <PageTitle>Главная - @_projectName</PageTitle>
 <HeadContent>
@@ -160,7 +161,18 @@
         _projectName = AboutConf.Value.ProjectName;
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
     }
-    
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            MessageBox.ShowMessageBox("Опять про куки", AboutConf.Value.CookiePolicy, "Понятно", "Не понятно", options: new DialogOptions()
+            {
+                DisableBackdropClick = true
+            });
+        }
+    }
+
     private void SendWishes()
     {
         if (_isFormValid == false)

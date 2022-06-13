@@ -1,5 +1,5 @@
 using Schedule.Core.Interfaces.Services;
-using Schedule.Services;
+using Schedule.Core.Services;
 
 namespace Schedule.Tests.Services;
 

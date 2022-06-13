@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Schedule.Core.Interfaces.Services;
 
-namespace Schedule.Services;
+namespace Schedule.Core.Services;
 
 public class NavigationService : INavigation
 {

@@ -1,8 +1,8 @@
+using Schedule.Core.Data.Models;
 using Schedule.Core.Interfaces.Data;
 using Schedule.Core.Interfaces.Services;
-using Schedule.Data.Models;
 
-namespace Schedule.Services;
+namespace Schedule.Core.Services;
 
 public class FindRoutes : IFindRoute
 {
@@ -22,7 +22,7 @@ public class FindRoutes : IFindRoute
 
     public IEnumerable<RouteItem> FindRoutesByArrivalPoint(string point)
     {
-        var result = _routes.Where(item => string.Equals(item.To, point, StringComparison.OrdinalIgnoreCase));
+        var result = _routes.Where(item => item.To.Contains(point, StringComparison.OrdinalIgnoreCase));
 
         return result;
     }

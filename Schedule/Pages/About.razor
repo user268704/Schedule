@@ -1,8 +1,8 @@
 @page "/about"
 @using Microsoft.Extensions.Options
-@using Schedule.Data.Models
+@using Schedule.Core.Data.Models.Config
 @inject IOptions<Contacts> OptionsContacts
-@inject IOptions<Data.Models.About> OptionsAbout
+@inject IOptions<Core.Data.Models.Config.About> OptionsAbout
 
 <PageTitle>О проекте - @_projectName</PageTitle>
 <HeadContent>
@@ -45,9 +45,15 @@
                     Или можно в соц.сетях тут
                 </MudText>
                 <MudStack Spacing="10" Row="true">
-                    <MudIconButton Icon="@Icons.Custom.Brands.Telegram" Href="@_telegramContact" Color="Color.Dark"/>
-                    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@_gitHubContact" Color="Color.Dark"/>
-                    <MudIconButton Icon="@Icons.Custom.Brands.Twitter" Href="@_twitterContact" Color="Color.Dark"/>
+                    <MudTooltip Text="Наш телеграм" Arrow="true" Placement="Placement.Bottom">
+                        <MudIconButton Icon="@Icons.Custom.Brands.Telegram" Href="@_telegramContact"/>
+                    </MudTooltip>
+                    <MudTooltip Text="GitHub проекта" Arrow="true" Placement="Placement.Bottom">
+                        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Href="@_gitHubContact"/>
+                    </MudTooltip>
+                    <MudTooltip Text="Твитор (VPN use)" Arrow="true" Placement="Placement.Bottom">
+                        <MudIconButton Icon="@Icons.Custom.Brands.Twitter" Href="@_twitterContact"/>
+                    </MudTooltip>
                 </MudStack>
             </MudStack>
         </div>

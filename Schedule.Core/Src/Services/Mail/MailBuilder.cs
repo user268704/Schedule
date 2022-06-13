@@ -1,7 +1,6 @@
 using System.Net.Mail;
-using System.Text;
 
-namespace Schedule.Services.Mail;
+namespace Schedule.Core.Services.Mail;
 
 public class MailBuilder
 {

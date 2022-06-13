@@ -2,11 +2,11 @@ using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using Schedule.Core.Data.Models;
+using Schedule.Core.Data.Models.Pdf;
 using Schedule.Core.Interfaces.Services;
-using Schedule.Data.Models;
-using Schedule.Data.Models.Pdf;
 
-namespace Schedule.Services.Pdf;
+namespace Schedule.Core.Services.Pdf;
 
 public class MainDocument : IDocument, IPdfBuilder
 {
@@ -60,8 +60,8 @@ public class MainDocument : IDocument, IPdfBuilder
                 {
                     TextStyle style = TextStyle.Default.FontSize(20);
 
-                    header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Куда").Style(style);
                     header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Откуда").Style(style);
+                    header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Куда").Style(style);
                     header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Когда").Style(style);
                     header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Примечание").Style(style);
                 });
@@ -95,8 +95,8 @@ public class MainDocument : IDocument, IPdfBuilder
                     {
                         TextStyle style = TextStyle.Default.FontSize(20);
 
-                        header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Куда").Style(style);
                         header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Откуда").Style(style);
+                        header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Куда").Style(style);
                         header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Когда").Style(style);
                         header.Cell().BorderBottom(3).BorderColor(AccentColor).Text("Примечание").Style(style);
                     });
@@ -117,15 +117,15 @@ public class MainDocument : IDocument, IPdfBuilder
 
             if (i % 2 == 0)
             {
-                table.Cell().Background(Colors.Grey.Lighten1).Text(routeItem.To).Style(cellStyle);
                 table.Cell().Background(Colors.Grey.Lighten1).Text(routeItem.From).Style(cellStyle);
+                table.Cell().Background(Colors.Grey.Lighten1).Text(routeItem.To).Style(cellStyle);
                 table.Cell().Background(Colors.Grey.Lighten1).Text(routeItem.DepartureTime).Style(cellStyle);
                 table.Cell().Background(Colors.Grey.Lighten1).Text(routeItem.Note).Style(cellStyle);
             }
             else
             {
-                table.Cell().Text(routeItem.To).Style(cellStyle);
                 table.Cell().Text(routeItem.From).Style(cellStyle);
+                table.Cell().Text(routeItem.To).Style(cellStyle);
                 table.Cell().Text(routeItem.DepartureTime).Style(cellStyle);
                 table.Cell().Text(routeItem.Note).Style(cellStyle);
             }

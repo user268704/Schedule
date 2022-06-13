@@ -1,6 +1,6 @@
 using QuestPDF.Infrastructure;
-using Schedule.Data.Models;
-using Schedule.Data.Models.Pdf;
+using Schedule.Core.Data.Models;
+using Schedule.Core.Data.Models.Pdf;
 
 namespace Schedule.Core.Interfaces.Services;
 

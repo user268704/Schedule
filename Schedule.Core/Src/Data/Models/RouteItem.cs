@@ -1,6 +1,6 @@
-﻿namespace Schedule.Data.Models
+﻿namespace Schedule.Core.Data.Models
 {
-    public class RouteItem : IEquatable<RouteItem>
+    public sealed class RouteItem : IEquatable<RouteItem>
     {
         public int Id { get; set; }
         public string RouteName { get; set; } = null!;
@@ -20,22 +20,6 @@
                    other.Note == Note &&
                    other.DepartureTime == DepartureTime &&
                    other.RouteName == RouteName;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is not RouteItem)
-                throw new InvalidCastException();
-
-            var equaler = (RouteItem)obj;
-
-            return equaler.IsSpecialDay == IsSpecialDay &&
-                   equaler.From == From &&
-                   equaler.Id == Id &&
-                   equaler.To == To &&
-                   equaler.Note == Note &&
-                   equaler.DepartureTime == DepartureTime &&
-                   equaler.RouteName == RouteName;
         }
     }
 }

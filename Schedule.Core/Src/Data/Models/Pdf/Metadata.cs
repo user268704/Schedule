@@ -1,4 +1,4 @@
-namespace Schedule.Data.Models.Pdf;
+namespace Schedule.Core.Data.Models.Pdf;
 
 public class Metadata
 {

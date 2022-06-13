@@ -1,4 +1,4 @@
-using Schedule.Data.Models;
+using Schedule.Core.Data.Models;
 
 namespace Schedule.Core.Interfaces.Data;
 

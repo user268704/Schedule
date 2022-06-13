@@ -1,6 +1,6 @@
 using Schedule.Core.Interfaces.Services;
 
-namespace Schedule.Services.Mail;
+namespace Schedule.Core.Services.Mail;
 
 public class MailService : IMailService
 {

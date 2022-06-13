@@ -1,4 +1,4 @@
-namespace Schedule.Data.Models;
+namespace Schedule.Core.Data.Models;
 
 public class RoutePack
 {

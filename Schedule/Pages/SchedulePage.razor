@@ -1,7 +1,7 @@
 @page "/schedule"
 @using Schedule.Core.Interfaces.Data
 @using Schedule.Core.Interfaces.Services
-@using Schedule.Data.Models
+@using Schedule.Core.Data.Models
 @inject IPdfBuilder PdfBuilder
 @inject IRouteData RouteData
 @inject IFindRoute FindService
@@ -22,24 +22,42 @@
 
 <MudContainer>
     <MudStack Spacing="5">
-        <MudStack Row="true" Spacing="2">
-            <MudText Typo="Typo.h4">
-                Расписание по маршруту
-            </MudText>
-            <MudSelect T="string" @ref="_selectRoute" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined" ValueChanged="OnSelectedRoute" Placeholder="Выберете нужный вам маршрут">
-                @if (_routeNames != null)
-                {
-                    @foreach (var item in _routeNames)
+        <MudStack>
+            <MudStack Row="true" Spacing="4">
+                <MudText Typo="Typo.h4">
+                    Расписание по маршруту
+                </MudText>
+                <MudSelect T="string" @ref="_selectRoute" AnchorOrigin="Origin.TopCenter" Variant="Variant.Outlined" ValueChanged="OnSelectedRoute" Placeholder="Выберете нужный вам маршрут">
+                    @if (_routeNames != null)
                     {
-                        <MudSelectItem Value="@item"/>
+                        @foreach (var item in _routeNames)
+                        {
+                            <MudSelectItem Value="@item"/>
+                        }
                     }
-                }
-            </MudSelect>
+                </MudSelect>
+            </MudStack>
+            @if (_routes != null && _routes.Any())
+            {
+                <MudStack Row="true" Spacing="5">
+                    <MudText>
+                        Результатов <MudText Typo="Typo.inherit" Color="Color.Info">@_routes.Count.ToString()</MudText>
+                    </MudText>
+                    <MudText>
+                        По маршруту <MudText Typo="Typo.inherit" Color="Color.Info">@_routes.First().RouteName</MudText>
+                    </MudText>
+                    <MudSpacer/>
+                    <MudButton OnClick="SaveAsPdf" StartIcon="@Icons.Filled.Download" Variant="Variant.Filled">
+                        Сохранить на память
+                    </MudButton>
+                    <MudText>@_routes.First().From - @_routes.First().To</MudText>
+                </MudStack>
+            }
         </MudStack>
 
         @if (_routes != null && _routes.Any())
         {
-            <MudTable T="RouteItem" Items="@_routes" GroupBy="@_groupDefinition" Loading="_scheduleLoad" Hover="true" Breakpoint="Breakpoint.Sm">
+            <MudTable T="RouteItem" Items="@_routes" GroupBy="@_groupDefinition" Loading="_scheduleLoad" Striped="true" Breakpoint="Breakpoint.Sm">
                 <ColGroup>
                     <col/>
                     <col/>
@@ -48,10 +66,10 @@
                 </ColGroup>
                 <HeaderContent>
                     <MudTh>
-                        <MudTableSortLabel T="RouteItem" SortBy="model => model.To">Куда</MudTableSortLabel>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.From">Откуда</MudTableSortLabel>
                     </MudTh>
                     <MudTh>
-                        <MudTableSortLabel T="RouteItem" SortBy="model => model.From">Откуда</MudTableSortLabel>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.To">Куда</MudTableSortLabel>
                     </MudTh>
                     <MudTh>
                         <MudTableSortLabel T="RouteItem" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
@@ -61,35 +79,33 @@
                     </MudTh>
                 </HeaderContent>
                 <GroupHeaderTemplate>
-                    @if ((bool) context.Key)
+                    @if ((bool)context.Key)
                     {
                         <MudTh>
-                            Выходные, праздники
+                            <MudText Typo="Typo.h4">
+                                Выходные, праздники
+                            </MudText>
                         </MudTh>
                     }
                     else
                     {
                         <MudTh>
-                            Будни
+                            <MudText Typo="Typo.h4">
+                                Будни
+                            </MudText>
                         </MudTh>
                     }
                 </GroupHeaderTemplate>
                 <RowTemplate>
-                    <MudTd DataLabel="Куда">@context.To</MudTd>
                     <MudTd DataLabel="Откуда">@context.From</MudTd>
+                    <MudTd DataLabel="Куда">@context.To</MudTd>
                     <MudTd DataLabel="Время">@context.DepartureTime</MudTd>
                     <MudTd DataLabel="Примечание">@context.Note</MudTd>
                 </RowTemplate>
             </MudTable>
-            <MudStack Row="true" Justify="Justify.FlexEnd"> 
-                <MudButton OnClick="SaveAsPdf" StartIcon="@Icons.Filled.Download" Variant="Variant.Filled">
-                    Сохранить на память
-                </MudButton>
-            </MudStack>
         }
     </MudStack>
 </MudContainer>
-
 
 @code {
     private string Search { get; set; }
@@ -102,7 +118,7 @@
 
     MudSelect<string> _selectRoute;
     IEnumerable<string> _routeNames;
-    IEnumerable<RouteItem> _routes;
+    List<RouteItem>? _routes;
     private bool _scheduleLoad;
 
     protected override void OnInitialized()
@@ -134,14 +150,18 @@
         {
             StartLoading();
             _routeNames = RouteData.GetAllRoutes()
-                .Distinct()
+                .DistinctBy(item => item.RouteName)
                 .Select(item => item.RouteName);
 
             SetDefaultValues();
             
-            if (Search != null) 
-                FindRoute(Search);
             
+            if (Search != null)
+            {
+                Search = Uri.UnescapeDataString(Search);
+                FindRoute(Search);
+            }
+
             StopLoading();
         }
     }
@@ -162,7 +182,7 @@
         {
             var resultRoutes = FindService.Find(query);
             
-            _routes = resultRoutes;
+            _routes = resultRoutes.ToList();
         }
         catch (Exception)
         {
@@ -189,7 +209,7 @@
 
     private void OnSelectedRoute(string id)
     {
-        _routes = FindService.Find(id);
+        _routes = FindService.Find(id).ToList();
     }
     
     private async Task SaveAsPdf()

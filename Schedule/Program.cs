@@ -1,11 +1,11 @@
 using MudBlazor.Services;
+using Schedule.Core.Data.Models.Config;
 using Schedule.Core.Interfaces.Data;
 using Schedule.Core.Interfaces.Services;
-using Schedule.Data.Models;
-using Schedule.Services;
-using Schedule.Services.Mail;
-using Schedule.Services.Pdf;
-using AboutConfig = Schedule.Data.Models.About;
+using Schedule.Core.Services;
+using Schedule.Core.Services.Mail;
+using Schedule.Core.Services.Pdf;
+using AboutConfig = Schedule.Core.Data.Models.Config.About;
 using RouteContext = Schedule.Infrastructure.Data.Context.RouteContext;
 
 var builder = WebApplication.CreateBuilder(args);
