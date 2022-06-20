@@ -162,17 +162,6 @@
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
     }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            MessageBox.ShowMessageBox("Опять про куки", AboutConf.Value.CookiePolicy, "Понятно", "Не понятно", options: new DialogOptions()
-            {
-                DisableBackdropClick = true
-            });
-        }
-    }
-
     private void SendWishes()
     {
         if (_isFormValid == false)
