@@ -23,32 +23,38 @@
                       Adornment="Adornment.End" Label="Поиск по маршруту, пункту назначения/отправления"/>
     </MudContainer>
     
-    <MudStack Row="true" Justify="Justify.SpaceAround">
-        <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/schedule")'>
-            <div class="card_media_parent">
-                <MudCardMedia Image="pictures/placeholder_1.jpg" Class="mud_card_image"/>
-            </div>
-            <MudCardContent>
-                <MudText Typo="Typo.h4" Align="Align.Center">Полное расписание</MudText>
-            </MudCardContent>
-        </MudCard>
-        <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/about")'>
-            <div class="card_media_parent">
-                <MudCardMedia Image="pictures/placeholder_2.jpg" Class="mud_card_image"/>
-            </div>
-            <MudCardContent>
-                <MudText Typo="Typo.h4" Align="Align.Center">О проекте</MudText>
-            </MudCardContent>
-        </MudCard>
-        <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/resources")'>
-            <div class="card_media_parent">
-                <MudCardMedia Image="pictures/placeholder_3.jpg" Class="mud_card_image"/>
-            </div>
-            <MudCardContent>
-                <MudText Typo="Typo.h4" Align="Align.Center">Материалы</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudStack>
+    <MudGrid Justify="Justify.SpaceEvenly">
+        <MudItem lg="3" xl="3" md="2">
+            <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/schedule")'>
+                <div class="card_media_parent">
+                    <MudCardMedia Height="360" Image="pictures/placeholder_1.jpg" Class="mud_card_image"/>
+                </div>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Align="Align.Center">Полное расписание</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem lg="3" xl="3" md="3">
+            <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/about")'>
+                <div class="card_media_parent">
+                    <MudCardMedia Height="360" Image="pictures/placeholder_2.jpg" Class="mud_card_image"/>
+                </div>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Align="Align.Center">О проекте</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem lg="3" xl="3" md="3">
+            <MudCard Class="mud_card" @onclick='() => NavigationManager.NavigateTo($"/resources")'>
+                <div class="card_media_parent">
+                    <MudCardMedia Height="360" Image="pictures/placeholder_3.jpg" Class="mud_card_image"/>
+                </div>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Align="Align.Center">Материалы</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
     <MudContainer>
         <MudExpansionPanels>
             <MudExpansionPanel Text="Откуда взялись автобусы?">

@@ -9,7 +9,7 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 <MudLayout>
-    <MudAppBar Fixed="false">
+    <MudAppBar>
         <MudToggleIconButton ToggledIcon="@Icons.Filled.MenuOpen" Icon="@Icons.Filled.Menu" @bind-Toggled="_openedDrawer" @onclick="ToggleDrawer" Color="Color.Secondary" ToggledColor="Color.Secondary"/>
         <MudSpacer/>
         <MudText Typo="Typo.body1">
@@ -19,7 +19,7 @@
             <MudToggleIconButton ToggledIcon="@Icons.Material.Filled.LightMode" Color="Color.Default"  ToggledColor="Color.Default" Icon="@Icons.Material.Filled.DarkMode" @bind-Toggled="_isDarkMode"/>
         </MudTooltip>
     </MudAppBar>
-    <MudDrawer @bind-Open="@_openedDrawer" Breakpoint="Breakpoint.Xl" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.Left">
+    <MudDrawer @bind-Open="@_openedDrawer" Breakpoint="Breakpoint.Sm" Variant="DrawerVariant.Persistent" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.Left">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6" Align="Align.Center">
                 BGIT the Best
@@ -38,8 +38,8 @@
         @Body
     </MudMainContent>                                                                               
     <MudDivider Style="margin: 20px 0" DividerType="DividerType.FullWidth"/>
-    <footer>
-        <MudStack Row="true" Style="margin: 20px 0" Justify="Justify.SpaceAround">
+    <MudGrid Justify="Justify.SpaceEvenly">
+        <MudItem>
             <MudStack Justify="Justify.FlexEnd" Class="feedback">
                 <MudText Typo="Typo.h4">
                     Связь
@@ -81,14 +81,18 @@
                     </MudStack>
                 </MudStack>
             </MudStack>
+        </MudItem>
+        <MudItem>
             <MudStack Class="policy" Justify="Justify.FlexEnd">
                 <MudText Typo="Typo.h4" Align="Align.Center">
                     Copyright
                 </MudText>
                 <MudText Typo="Typo.body1" Align="Align.Center">
-                    Все права, если кто не знал, защищены
+                    Все права защищены
                 </MudText>
             </MudStack>
+        </MudItem>
+        <MudItem>
             <MudStack Class="about" Justify="Justify.FlexEnd">
                 <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
                     <MudText Typo="Typo.h4">
@@ -99,8 +103,9 @@
                     </MudLink>
                 </MudStack>
             </MudStack>
-        </MudStack>
-    </footer>
+        </MudItem>
+
+    </MudGrid>
 </MudLayout>
 
 @code{

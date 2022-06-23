@@ -161,23 +161,27 @@
         }
     }
 
+    
     private void StartLoading()
     {
         _scheduleLoad = true;
         StateHasChanged();
     }
 
+    /// <summary>Stops the loading indicator</summary>
     private void StopLoading()
     {
         _scheduleLoad = false;
         StateHasChanged();
     }
-
+    
+    // Ошибка поиска
     private void ShowErrorSearch()
     {
         MessageBox.ShowMessageBox("Проблема", "Ничего не найдено", yesText:"Понятно");
     }
 
+    // Сохранить в PDF
     private async Task SaveAsPdf()
     {
         StartLoading();

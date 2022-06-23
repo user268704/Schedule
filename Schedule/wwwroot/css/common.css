@@ -1,6 +1,4 @@
 .mud_card_image {
-    width: 100%;
-    height: 100%;
     background-position: center;
     background-size: cover;
     transition: all .5s;
@@ -15,7 +13,5 @@
 }
 
 .card_media_parent {
-    width: 360px;
-    height: 360px;
     overflow: hidden;
 }

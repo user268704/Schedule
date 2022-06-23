@@ -24,6 +24,7 @@ builder.Services.AddScoped<IPdfBuilder, MainDocument>();
 builder.Services.AddScoped<IFindRoute, FindRoutes>();
 builder.Services.AddScoped<IMailService, MailService>();
 
+
 builder.Services.Configure<AboutConfig>(builder.Configuration.GetSection(AboutConfig.SectionName));
 builder.Services.Configure<Contacts>(builder.Configuration.GetSection(Contacts.SectionName));
 
