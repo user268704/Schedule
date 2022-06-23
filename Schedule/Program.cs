@@ -5,6 +5,7 @@ using Schedule.Core.Interfaces.Services;
 using Schedule.Core.Services;
 using Schedule.Core.Services.Mail;
 using Schedule.Core.Services.Pdf;
+using Schedule.Infrastructure.Data;
 using AboutConfig = Schedule.Core.Data.Models.Config.About;
 using RouteContext = Schedule.Infrastructure.Data.Context.RouteContext;
 
@@ -17,7 +18,7 @@ builder.Services.AddMudServices(options =>
     options.SnackbarConfiguration.MaxDisplayedSnackbars = 5;
 });
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<IRouteData, RouteContext>();
+builder.Services.AddScoped<IRouteData, DriveContext>();
 builder.Services.AddScoped<INavigation, NavigationService>();
 builder.Services.AddScoped<IPdfBuilder, MainDocument>();
 builder.Services.AddScoped<IFindRoute, FindRoutes>();

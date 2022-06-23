@@ -1,0 +1,202 @@
+@page "/search"
+
+@using Schedule.Core.Interfaces.Data
+@using Schedule.Core.Interfaces.Services
+@using Schedule.Core.Data.Models
+@inject IPdfBuilder PdfBuilder
+@inject IRouteData RouteData
+@inject IFindRoute FindService
+@inject INavigation Navigation
+@inject IJSRuntime JS
+@inject IDialogService MessageBox
+@inject NavigationManager NavigationManager;
+
+
+<PageTitle>Расписание</PageTitle>
+
+@if (_scheduleLoad)
+{
+    <MudOverlay @bind-Visible="_scheduleLoad" LockScroll="true" DarkBackground="true">
+        <MudProgressCircular Color="@Color.Primary" Indeterminate="true"/>
+    </MudOverlay>
+}
+
+<MudContainer>
+    <MudStack Spacing="5">
+        <MudStack>
+            <MudStack Row="true" Spacing="4">
+                @*<MudText Typo="Typo.h4">
+                    Расписание по маршруту
+                </MudText>*@
+                
+            </MudStack>
+            @if (_firstResult != null && _firstResult.Any())
+            {
+                <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center">
+                    <MudText>
+                        Результатов <MudText Typo="Typo.inherit" Color="Color.Info">@_routes.Count.ToString()</MudText>
+                    </MudText>
+                    <MudChipSet Filter="true" SelectedChipChanged="OnSelectedFilterChip">
+                        @foreach (var route in _firstResult.DistinctBy(item => item.RouteName))
+                        {
+                            <MudChip Text="@route.RouteName" />
+                        }
+                    </MudChipSet>
+                    <MudSpacer/>
+                    <MudButton OnClick="SaveAsPdf" StartIcon="@Icons.Filled.Download" Variant="Variant.Filled">
+                        Сохранить на память
+                    </MudButton>
+                </MudStack>
+            }
+        </MudStack>
+
+        @if (_firstResult != null && _firstResult.Any())
+        {
+            <MudTable T="RouteItem" Items="@_routes" GroupBy="@_groupDefinition" Loading="_scheduleLoad" Striped="true" Breakpoint="Breakpoint.Sm">
+                <ColGroup>
+                    <col/>
+                    <col/>
+                    <col/>
+                    <col/>
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.From">Откуда</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.To">Куда</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.DepartureTime">Время</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="RouteItem" SortBy="model => model.Note">Примечание</MudTableSortLabel>
+                    </MudTh>
+                </HeaderContent>
+                <GroupHeaderTemplate>
+                    <MudTh>
+                        <MudText Typo="Typo.h5">
+                            @context.Key
+                        </MudText>
+                    </MudTh>
+                </GroupHeaderTemplate>
+                <RowTemplate>
+                    <MudTd DataLabel="Откуда">@context.From</MudTd>
+                    <MudTd DataLabel="Куда">@context.To</MudTd>
+                    <MudTd DataLabel="Время">@context.DepartureTime</MudTd>
+                    <MudTd DataLabel="Примечание">@context.Note</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string Search { get; set; }
+    private TableGroupDefinition<RouteItem> _groupDefinition = new()
+    {
+        Indentation = false,
+        Expandable = false,
+        Selector = route => route.RouteName
+    };
+
+    List<RouteItem>? _routes;
+    List<RouteItem>? _firstResult;
+    private bool _scheduleLoad;
+
+    protected override void OnInitialized()
+    {
+        // Нет отписки, так как нет обработчика переключения страниц
+        NavigationManager.LocationChanged += LocationChanged;
+
+        Dictionary<string, string> paramsFromQuery = Navigation.GetParamsFromQuery(NavigationManager.Uri);
+
+        try
+        {
+            Search = paramsFromQuery["query"];
+        }
+        catch (KeyNotFoundException) { }
+    }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        Dictionary<string, string> paramsFromQuery = Navigation.GetParamsFromQuery(NavigationManager.Uri);
+
+
+        string search = Search;
+        paramsFromQuery.TryGetValue("query", out search);
+    }
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StartLoading();
+            
+            Search = Uri.UnescapeDataString(Search);
+            FindRoute(Search);
+            
+            StopLoading();
+        }
+    }
+
+    /// <summary>Sets the search value</summary>
+    void FindRoute(string query)
+    {
+        if (string.IsNullOrEmpty(query))
+        {
+            return;
+        }
+
+        try
+        {
+            var resultRoutes = FindService.Find(query);
+
+            _firstResult = resultRoutes.ToList();
+            _routes = resultRoutes.ToList();
+        }
+        catch (Exception)
+        {
+            ShowErrorSearch();
+        }
+    }
+
+    private void StartLoading()
+    {
+        _scheduleLoad = true;
+        StateHasChanged();
+    }
+
+    private void StopLoading()
+    {
+        _scheduleLoad = false;
+        StateHasChanged();
+    }
+
+    private void ShowErrorSearch()
+    {
+        MessageBox.ShowMessageBox("Проблема", "Ничего не найдено", yesText:"Понятно");
+    }
+
+    private async Task SaveAsPdf()
+    {
+        StartLoading();
+        
+        byte[] resultPdf = PdfBuilder.BuildPdf(_routes);
+        StopLoading();
+
+        Stream pdfStream = new MemoryStream(resultPdf);
+        using var streamJs = new DotNetStreamReference(pdfStream);
+        
+        await JS.InvokeVoidAsync("downloadFileFromStream", PdfBuilder.GetMetadata().Title, streamJs);
+    }
+
+    private void OnSelectedFilterChip(MudChip obj)
+    {
+        if (obj != null)
+        {
+            obj.Color = Color.Info;
+            _routes = _firstResult.Where(item => item.RouteName == obj.Text).ToList();
+        }
+    }
+}
