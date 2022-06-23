@@ -87,7 +87,7 @@
             Stream pdfStream = new MemoryStream(resultPdf);
             using var streamJs = new DotNetStreamReference(pdfStream);
 
-            await JS.InvokeVoidAsync("downloadFileFromStream", PdfBuilder.GetMetadata().Title, streamJs);
+            await JS.InvokeVoidAsync("downloadFileFromStream", PdfBuilder.GetMetadata().Title + ".pdf", streamJs);
         }
     }
 }
