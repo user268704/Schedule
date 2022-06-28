@@ -1,3 +1,19 @@
+@font-face {
+    font-family: 'Merienda';
+    src: url('../fonts/Merienda-Regular.ttf') format('truetype');
+}
+
+.logo {
+    font-family: 'Merienda';
+    font-size: 3em;
+    color: #fff;
+    text-shadow: 0 0 0.5em #000;
+}
+
+.logo-accent {
+    color: #B03434;
+}
+
 .mud_card_image {
     background-position: center;
     background-size: cover;
